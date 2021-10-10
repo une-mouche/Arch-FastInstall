@@ -31,10 +31,10 @@ archroot () {
 
     echo -n "New sudo user name: "
     read username
-    useradd -m $username
+    useradd -m "$username"
     echo "$username new password:"
-    passwd $username
-    usermod -aG wheel,audio,video $username
+    passwd "$username"
+    usermod -aG wheel,audio,video "$username"
 
     # update pacman
     pacman -Sy --noconfirm
@@ -53,7 +53,7 @@ archroot () {
         mount /dev/sda1 /boot/EFI
         grub-install --target=x86_64-efi --bootlloader-id=grub_eufi --recheck
     else
-        pacman -S dosfstools os prober mtools --noconfirm
+        pacman -S dosfstools os-prober mtools --noconfirm
         grub-install --target=i386-pc /dev/sda --recheck
     fi
     grub-mkconfig -o /boot/grub/grub.cfg
@@ -62,14 +62,14 @@ archroot () {
     echo "Installing netctl by default. Do you prefer NetworkManager (y/N)?"
     read network
     if [[ "$network" == [yY] || "$network" == [yY][eE][sS] ]]; then
-        pacman -S netctl wifi-menu --noconfirm
-    else
         pacman -S networkmanager --noconfirm
         echo "Enable NetworkManager daemon (y/N)?"
         read daemonNetworkManager
         if [[ "$daemonNetworkManager" == [yY] || "$daemonNetworkManager" == [yY][eE][sS] ]]; then
             systemctl enable networkmanager
         fi
+    else
+        pacman -S netctl wifi-menu --noconfirm
     fi
 
     install_package () {
@@ -106,15 +106,17 @@ archroot () {
         fi
 
         pacman -S git base-devel
+        su "$1"
         cd /opt
         git clone https://aur.archlinux.org/yay.git
         cd yay
         makepkg -si
+        exit
     }
 
     install_package "vim"
     install_package "base-devel"
-    install_yay
+    install_yay "$username"
 
 }
 
