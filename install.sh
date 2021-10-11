@@ -108,7 +108,7 @@ archroot () {
         pacman -S git base-devel
 
         install_yay2 () {
-            cd /opt
+            cd /tmp
             git clone https://aur.archlinux.org/yay.git
             cd yay
             makepkg -si
