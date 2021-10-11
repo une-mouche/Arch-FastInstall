@@ -106,11 +106,15 @@ archroot () {
         fi
 
         pacman -S git base-devel
-        su "$1"
-        cd /opt
-        git clone https://aur.archlinux.org/yay.git
-        cd yay
-        makepkg -si
+
+        install_yay2 () {
+            cd /opt
+            git clone https://aur.archlinux.org/yay.git
+            cd yay
+            makepkg -si
+        }
+        export -f install_yay2
+        su "$1" -c "install_yay2"
         exit
     }
 
